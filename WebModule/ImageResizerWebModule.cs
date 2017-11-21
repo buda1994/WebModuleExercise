@@ -14,17 +14,33 @@ namespace WebModule
     {
         public ImageResizerWebModule(string folder, int defaultWidth = 500, int defaultHeight = 400)
         {
-            AddHandler("/api/echo/warsong/", HttpVerbs.Any, (context, ct) =>
+            AddHandler(ModuleMap.AnyPath, HttpVerbs.Any, (context, ct) =>
             {
                 return Task.FromResult(ResizeImage(context, folder, defaultWidth, defaultHeight));
             });
         }
 
-        private bool ResizeImage(HttpListenerContext context, string image, int defaultWidth, int defaultHeight)
+        private bool ResizeImage(HttpListenerContext context, string folder, int defaultWidth, int defaultHeight)
         {
             byte[] byteArray;
 
+            var strings = context.Request.RawUrl.Split('/');
+
+            if(strings.Length == 3)
+            {
+                defaultWidth = int.Parse(strings[2]);
+            }
+            else if(strings.Length == 4)
+            {
+                defaultWidth = int.Parse(strings[2]);
+                defaultHeight = int.Parse(strings[3]);
+            }
+
+            var image = folder + "/" + strings[1];
+            image = image.Replace("/", "\\");
+
             var imgIn = new Bitmap(image);
+
             double y = imgIn.Height;
             double x = imgIn.Width;
 

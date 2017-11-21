@@ -14,7 +14,7 @@ namespace WebModule
             {
                 var assemblyPath = Path.GetDirectoryName(typeof(Program).GetTypeInfo().Assembly.Location);
 
-                return Path.Combine(Directory.GetParent(assemblyPath).Parent.Parent.FullName, "Warsong.png");
+                return Path.Combine(Directory.GetParent(assemblyPath).Parent.Parent.FullName, "images");
             }
         }
 
@@ -24,13 +24,13 @@ namespace WebModule
 
             using(var server = new WebServer(url, RoutingStrategy.Regex))
             {
-                server.RegisterModule(new ImageResizerWebModule(HtmlRootPath,0,0));
+                server.RegisterModule(new ImageResizerWebModule(HtmlRootPath));
                 
                 server.RunAsync();
 
                 var browser = new System.Diagnostics.Process()
                 {
-                    StartInfo = new System.Diagnostics.ProcessStartInfo(url + "api/echo/Warsong") { UseShellExecute = true }
+                    StartInfo = new System.Diagnostics.ProcessStartInfo(url + "Warsong.png") { UseShellExecute = true }
                 };
                 browser.Start();
 
