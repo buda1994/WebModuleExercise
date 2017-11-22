@@ -91,9 +91,8 @@ namespace WebModule
             catch
             {
                 context.Response.StatusCode = 404;
-                //context.JsonResponse("Error 404, Page Not Found");
-                return false;
 
+                return false;
             }
         }
 
@@ -112,6 +111,7 @@ namespace WebModule
                 default:
                 break;
             }
+
             return ImageFormat.Jpeg;
         }
     }
