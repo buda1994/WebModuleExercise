@@ -45,6 +45,7 @@ namespace WebModule
                     if(strings.Length == 3)
                     {
                         defaultWidth = int.Parse(strings[2]);
+                        defaultHeight = y * defaultWidth / x;
                     }
                     else if(strings.Length == 4)
                     {

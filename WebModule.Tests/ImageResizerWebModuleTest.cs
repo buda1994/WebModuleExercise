@@ -25,7 +25,7 @@ namespace WebModule.Tests
         }
 
         [TestCase("Warsong.png", 395, 395)]
-        [TestCase("Warsong.png/700", 700, 400)]
+        [TestCase("Warsong.png/700", 700, 700)]
         [TestCase("Warsong.png/thumb", 500, 400)]
         [TestCase("Warsong.png/700/500", 700, 500)]
         public void WithValidPath_ReturnsImage(string urlParams, int expectedWidth, int expectedHeight)
@@ -46,9 +46,7 @@ namespace WebModule.Tests
                         Assert.AreEqual(image.Height, expectedHeight);
                         Assert.AreEqual(image.Width, expectedWidth);
                     }
-
                 }
-
             }
         }
 
