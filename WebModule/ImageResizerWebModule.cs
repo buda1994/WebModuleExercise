@@ -12,8 +12,15 @@ namespace WebModule
 {
     public class ImageResizerWebModule : WebModuleBase
     {
+        public override string Name => nameof(ImageResizerWebModule).Humanize();
+
+        public byte[] ByteImage;
+
         public ImageResizerWebModule(string folder, int defaultWidth = 500, int defaultHeight = 400)
         {
+            if(folder == null)
+                throw new ArgumentNullException("path cannot be null");
+
             AddHandler(ModuleMap.AnyPath, HttpVerbs.Any, (context, ct) =>
             {
                 return Task.FromResult(ResizeImage(context, folder, defaultWidth, defaultHeight));
@@ -22,8 +29,6 @@ namespace WebModule
 
         private bool ResizeImage(HttpListenerContext context, string folder, int defaultWidth, int defaultHeight)
         {
-            byte[] byteArray;
-
             var strings = context.Request.RawUrl.Split('/');
 
             if(strings.Length == 3)
@@ -65,9 +70,9 @@ namespace WebModule
               new Rectangle(0, 0, (int)x, (int)y), GraphicsUnit.Pixel);
 
             imgOut.Save(outStream, getImageFormat(image));
-            byteArray = outStream.ToArray();
+            ByteImage = outStream.ToArray();
             
-            context.Response.OutputStream.Write(byteArray, 0, byteArray.Length);
+            context.Response.OutputStream.Write(ByteImage, 0, ByteImage.Length);
             
             return true;
         }
@@ -89,8 +94,6 @@ namespace WebModule
             }
             return ImageFormat.Jpeg;
         }
-
-        public override string Name => nameof(ImageResizerWebModule).Humanize();
     }
 
 }
