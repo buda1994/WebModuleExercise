@@ -61,7 +61,7 @@ namespace WebModule.Tests
         }
 
         [Test]
-        public void WithInvalidPath_ReturnsError404()
+        public void WithInvalidPath_ThrowsWebException()
         {
             using(var server = new WebServer(Url, RoutingStrategy.Regex))
             {
@@ -71,9 +71,8 @@ namespace WebModule.Tests
 
                 using(var webClient = new WebClient())
                 {
-                    var response = webClient.DownloadString(Url + "Invalid/Path");
-
-                    Assert.AreEqual("Error 404, Page Not Found", response);
+                    Assert.Throws<WebException>(() =>
+                        webClient.DownloadString(Url + "Invalid/Path"));
                 }
             }
         }

@@ -90,8 +90,10 @@ namespace WebModule
             }
             catch
             {
-                context.JsonResponse("Error 404, Page Not Found");
+                context.Response.StatusCode = 404;
+                //context.JsonResponse("Error 404, Page Not Found");
                 return false;
+
             }
         }
 
