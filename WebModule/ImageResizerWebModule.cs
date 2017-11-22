@@ -21,20 +21,22 @@ namespace WebModule
             if(folder == null)
                 throw new ArgumentNullException("path cannot be null");
 
-            AddHandler(ModuleMap.AnyPath, HttpVerbs.Any, (context, ct) =>
-            {
-                return Task.FromResult(ResizeImage(context, folder, defaultWidth, defaultHeight));
-            });
+            AddHandler(ModuleMap.AnyPath, HttpVerbs.Get, (context, ct) => ResizeImage(context, folder, defaultWidth, defaultHeight));
         }
 
-        private bool ResizeImage(HttpListenerContext context, string folder, double defaultWidth, double defaultHeight)
+        private Task<bool> ResizeImage(HttpListenerContext context, string folder, double defaultWidth, double defaultHeight)
         {
-            var strings = context.Request.RawUrl.Split('/');
-            var image = folder + "/" + strings[1];
-            image = image.Replace("/", "\\");
-            
+            return Resize(context, folder, defaultWidth, defaultHeight);
+        }
+
+        private async Task<bool> Resize(HttpListenerContext context, string folder, double defaultWidth, double defaultHeight)
+        {
             try
             {
+                var strings = context.Request.RawUrl.Split('/');
+                var image = folder + "/" + strings[1];
+                image = image.Replace("/", "\\");
+
                 var imgIn = new Bitmap(image);
                 double y = imgIn.Height;
                 double x = imgIn.Width;
@@ -84,14 +86,12 @@ namespace WebModule
                 imgOut.Save(outStream, getImageFormat(image));
                 ByteImage = outStream.ToArray();
 
-                context.Response.OutputStream.Write(ByteImage, 0, ByteImage.Length);
-
+                await context.Response.OutputStream.WriteAsync(ByteImage, 0, ByteImage.Length);
                 return true;
             }
             catch
             {
                 context.Response.StatusCode = 404;
-
                 return false;
             }
         }

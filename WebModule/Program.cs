@@ -30,7 +30,7 @@ namespace WebModule
                 
                 var browser = new System.Diagnostics.Process()
                 {
-                    StartInfo = new System.Diagnostics.ProcessStartInfo(url + "Warsong.png") { UseShellExecute = true }
+                    StartInfo = new System.Diagnostics.ProcessStartInfo(url + "Warsong.png/700") { UseShellExecute = true }
                 };
                 browser.Start();
 
