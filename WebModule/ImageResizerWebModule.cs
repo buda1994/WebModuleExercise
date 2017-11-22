@@ -16,7 +16,7 @@ namespace WebModule
 
         public byte[] ByteImage;
 
-        public ImageResizerWebModule(string folder, int defaultWidth = 500, int defaultHeight = 400)
+        public ImageResizerWebModule(string folder, double defaultWidth = 500, double defaultHeight = 400)
         {
             if(folder == null)
                 throw new ArgumentNullException("path cannot be null");
@@ -27,20 +27,9 @@ namespace WebModule
             });
         }
 
-        private bool ResizeImage(HttpListenerContext context, string folder, int defaultWidth, int defaultHeight)
+        private bool ResizeImage(HttpListenerContext context, string folder, double defaultWidth, double defaultHeight)
         {
             var strings = context.Request.RawUrl.Split('/');
-
-            if(strings.Length == 3)
-            {
-                defaultWidth = int.Parse(strings[2]);
-            }
-            else if(strings.Length == 4)
-            {
-                defaultWidth = int.Parse(strings[2]);
-                defaultHeight = int.Parse(strings[3]);
-            }
-
             var image = folder + "/" + strings[1];
             image = image.Replace("/", "\\");
 
@@ -48,6 +37,27 @@ namespace WebModule
 
             double y = imgIn.Height;
             double x = imgIn.Width;
+
+            if(strings.Length >= 3)
+            {
+                if(strings[2] != "thumb")
+                {
+                    if(strings.Length == 3)
+                    {
+                        defaultWidth = int.Parse(strings[2]);
+                    }
+                    else if(strings.Length == 4)
+                    {
+                        defaultWidth = int.Parse(strings[2]);
+                        defaultHeight = int.Parse(strings[3]);
+                    }
+                }
+            }
+            else
+            {
+                defaultWidth = x;
+                defaultHeight = y;
+            }
 
             double factorWidth = 1;
             double factorLength = 1;

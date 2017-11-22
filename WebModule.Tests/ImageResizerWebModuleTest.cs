@@ -5,12 +5,15 @@ using Unosquare.Labs.EmbedIO.Constants;
 using System.IO;
 using System.Reflection;
 using System.Net;
+using System.Drawing;
 
 namespace WebModule.Tests
 {
     [TestFixture]
     class ImageResizerWebModuleTest
     {
+        string Url = "http://localhost:9696/";
+
         public static string HtmlRootPath
         {
             get
@@ -21,39 +24,38 @@ namespace WebModule.Tests
             }
         }
 
-        [TestCase("Warsong.png", "http://localhost:9696/Warsong.png")]
-        [TestCase("Warsong.png/700", "http://localhost:9696/Warsong.png/700")]
-        [TestCase("Warsong.png/700/400", "http://localhost:9696/Warsong.png/700/400")]
-        public void WithValidPath_DoesNotThrowException(string urlParams, string expected)
+        [TestCase("Warsong.png", 395, 395)]
+        [TestCase("Warsong.png/700", 700, 400)]
+        [TestCase("Warsong.png/thumb", 500, 400)]
+        [TestCase("Warsong.png/700/500", 700, 500)]
+        public void WithValidPath_ReturnsImage(string urlParams, int expectedWidth, int expectedHeight)
         {
-            var url = "http://localhost:9696/";
-
-            using(var server = new WebServer(url, RoutingStrategy.Regex))
+            using(var server = new WebServer(Url, RoutingStrategy.Regex))
             {
                 server.RegisterModule(new ImageResizerWebModule(HtmlRootPath));
 
                 server.RunAsync();
 
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url + urlParams);
-
-                Uri siteUri = new Uri(expected);
-
-                using(HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using(var webClient = new WebClient())
                 {
-                    Assert.AreEqual(siteUri, response.ResponseUri);
-                    Assert.AreEqual("OK",response.StatusDescription);
+                    var imageBytes = webClient.DownloadData(Url + urlParams);
+
+                    using(var ms = new MemoryStream(imageBytes))
+                    {
+                        var image = Image.FromStream(ms);
+                        Assert.AreEqual(image.Height, expectedHeight);
+                        Assert.AreEqual(image.Width, expectedWidth);
+                    }
+
                 }
 
-                Assert.AreEqual(server.UrlPrefixes[0], "http://localhost:9696/");
             }
         }
 
         [Test]
         public void WithNullPath_ThrowsArgumentNullException()
         {
-            var url = "http://localhost:9696/";
-
-            using(var server = new WebServer(url, RoutingStrategy.Regex))
+            using(var server = new WebServer(Url, RoutingStrategy.Regex))
             {
                 Assert.Throws<ArgumentNullException>(() =>
                     server.RegisterModule(new ImageResizerWebModule(null)));
@@ -63,16 +65,14 @@ namespace WebModule.Tests
         [Test]
         public void WithInvalidPath_ThrowsWebException()
         {
-            var url = "http://localhost:9696/";
-
-            using(var server = new WebServer(url, RoutingStrategy.Regex))
+            using(var server = new WebServer(Url, RoutingStrategy.Regex))
             {
                 server.RegisterModule(new ImageResizerWebModule("Invalid/Path"));
 
                 server.RunAsync();
 
                 HttpWebResponse response;
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
                 
                 Assert.Throws<WebException>(() =>
                     response = (HttpWebResponse)request.GetResponse());
