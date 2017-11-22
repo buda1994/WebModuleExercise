@@ -71,7 +71,7 @@ namespace WebModule.Tests
 
                 using(var webClient = new WebClient())
                 {
-                    var response = webClient.DownloadString(Url + "dsasda");
+                    var response = webClient.DownloadString(Url + "Invalid/Path");
 
                     Assert.AreEqual("Error 404, Page Not Found", response);
                 }
