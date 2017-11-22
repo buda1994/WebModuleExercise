@@ -61,19 +61,20 @@ namespace WebModule.Tests
         }
 
         [Test]
-        public void WithInvalidPath_ThrowsWebException()
+        public void WithInvalidPath_ReturnsError404()
         {
             using(var server = new WebServer(Url, RoutingStrategy.Regex))
             {
-                server.RegisterModule(new ImageResizerWebModule("Invalid/Path"));
+                server.RegisterModule(new ImageResizerWebModule(HtmlRootPath));
 
                 server.RunAsync();
 
-                HttpWebResponse response;
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
-                
-                Assert.Throws<WebException>(() =>
-                    response = (HttpWebResponse)request.GetResponse());
+                using(var webClient = new WebClient())
+                {
+                    var response = webClient.DownloadString(Url + "dsasda");
+
+                    Assert.AreEqual("Error 404, Page Not Found", response);
+                }
             }
         }
     }

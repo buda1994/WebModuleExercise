@@ -27,7 +27,7 @@ namespace WebModule
                 server.RegisterModule(new ImageResizerWebModule(HtmlRootPath));
                 
                 server.RunAsync();
-
+                
                 var browser = new System.Diagnostics.Process()
                 {
                     StartInfo = new System.Diagnostics.ProcessStartInfo(url + "Warsong.png") { UseShellExecute = true }
