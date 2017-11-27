@@ -60,8 +60,9 @@ namespace WebModule.Tests
             }
         }
 
-        [Test]
-        public void WithInvalidPath_ThrowsWebException()
+        [TestCase("Invalid/Path")]
+        [TestCase("Warsong.png/700/500/800")]
+        public void WithInvalidPath_ThrowsWebException(string invalidPath)
         {
             using(var server = new WebServer(Url, RoutingStrategy.Regex))
             {
