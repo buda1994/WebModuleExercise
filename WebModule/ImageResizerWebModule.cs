@@ -21,12 +21,7 @@ namespace WebModule
             if(folder == null)
                 throw new ArgumentNullException("path cannot be null");
 
-            AddHandler(ModuleMap.AnyPath, HttpVerbs.Get, (context, ct) => ResizeImage(context, folder, defaultWidth, defaultHeight));
-        }
-
-        private Task<bool> ResizeImage(HttpListenerContext context, string folder, double defaultWidth, double defaultHeight)
-        {
-            return Resize(context, folder, defaultWidth, defaultHeight);
+            AddHandler(ModuleMap.AnyPath, HttpVerbs.Get, (context, ct) => Resize(context, folder, defaultWidth, defaultHeight));
         }
 
         private async Task<bool> Resize(HttpListenerContext context, string folder, double defaultWidth, double defaultHeight)
@@ -41,7 +36,7 @@ namespace WebModule
                 double y = imgIn.Height;
                 double x = imgIn.Width;
 
-                if(strings.Length >= 3)
+                if(strings.Length >= 3 && strings.Length < 5)
                 {
                     if(strings[2] != "thumb")
                     {
@@ -57,10 +52,14 @@ namespace WebModule
                         }
                     }
                 }
-                else
+                else if(strings.Length == 2)
                 {
                     defaultWidth = x;
                     defaultHeight = y;
+                }
+                else
+                {
+                    throw new NotSupportedException();
                 }
 
                 double factorWidth = 1;
